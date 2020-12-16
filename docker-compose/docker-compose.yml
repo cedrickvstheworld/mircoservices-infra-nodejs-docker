@@ -1,0 +1,55 @@
+# include keys.env file in ../ or update env_file dir in this file
+version: '3.4'
+
+services:
+  nginx:
+    container_name: nginx
+    build: ../nginx-node/.
+    ports:
+      - '80:80'
+    depends_on:
+      - mongo
+      - node01
+      - node02
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    logging:
+      driver: "none"
+    volumes:
+      - /home/jed/data/sample-db-volume:/data/db
+    ports:
+      - '27017:27017'
+    networks: 
+      - project-network
+  
+  node01:
+    container_name: node01
+    build: ../node01/.
+    ports:
+      - '8081:3000'
+    networks: 
+      - project-network
+    depends_on:
+      - mongo
+    env_file:
+      - ../.env
+  
+  node02:
+    container_name: node02
+    build: ../node02/.
+    ports:
+      - '8082:3000'
+    networks: 
+      - project-network
+    depends_on:
+      - mongo
+    env_file:
+      - ../.env
+
+
+volumes: 
+  project-db: {}
+networks: 
+  project-network:
